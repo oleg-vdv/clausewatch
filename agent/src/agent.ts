@@ -49,6 +49,13 @@ export async function ask(config: Config, question: string, onStep?: (note: stri
   if (!config.anthropicKey) {
     throw new Error('ANTHROPIC_API_KEY is not set. Use --no-llm for the deterministic report instead.')
   }
+  if (!config.contextToken) {
+    throw new Error(
+      'SANITY_CONTEXT_TOKEN is not set. The agent talks to the Context MCP endpoints, which need an ' +
+        'organisation token with Context Viewer permission. Without one, use --no-llm: it reads the ' +
+        'public dataset directly and needs no credentials.',
+    )
+  }
 
   const data = new McpClient(config.dataEndpoint, config.contextToken)
   const docs = new McpClient(config.docsEndpoint, config.contextToken)

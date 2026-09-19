@@ -6,6 +6,7 @@ contradict each other — and refuses to pick a side that no human has picked.
 Built for the [DEV Sanity Challenge](https://dev.to/devteam/join-the-sanity-challenge-2500-in-prizes-for-five-winners-514m),
 Path One.
 
+**Repository:** https://github.com/oleg-vdv/clausewatch
 **Sanity project ID:** `4yzoidsq` · **dataset:** `production` (public)
 **Public dataset URL:** https://4yzoidsq.api.sanity.io/v2026-09-19/data/query/production?query=*%5B_type%3D%3D%22conflict%22%5D
 **Studio:** https://clausewatch.sanity.studio/

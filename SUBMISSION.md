@@ -39,7 +39,7 @@ The viewer is server-rendered from the two Context endpoints; nothing is cached,
 changes when the dataset does.
 
 ```bash
-git clone <repo> && cd clausewatch/agent
+git clone https://github.com/oleg-vdv/clausewatch && cd clausewatch/agent
 cp ../.env.example ../.env    # add an org token with Context Viewer permission
 npm install && npm run web    # http://localhost:4173
 ```
@@ -65,7 +65,7 @@ because that is the one thing an editor of this dataset actually does.
 
 ## Code
 
-`<repo link>`
+**https://github.com/oleg-vdv/clausewatch**
 
 Two Sanity Context MCP endpoints, doing different jobs:
 

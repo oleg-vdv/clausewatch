@@ -66,26 +66,64 @@ const CONFLICT_PROJECTION = `{
   }
 }`
 
+/**
+ * Two ways in, and the difference matters.
+ *
+ * With a Context Viewer token this goes through the Sanity Context MCP endpoints — the
+ * real path, and the only one that can reach the Knowledge Base.
+ *
+ * Without one it reads the same dataset over the public query API, because the dataset
+ * is public and a project nobody outside the organisation can run is not much of a
+ * submission. The prose side is unavailable there, and says so rather than degrading
+ * quietly into an answer with no source behind it.
+ */
+export type Access = 'context' | 'public'
+
 export class ContextClient {
-  private readonly data: McpClient
-  private readonly docs: McpClient
+  private readonly data: McpClient | null
+  private readonly docs: McpClient | null
   private readonly knowledgeBaseId: string
+  private readonly publicQueryUrl: string
+  readonly access: Access
 
   constructor(config: Config) {
-    this.data = new McpClient(config.dataEndpoint, config.contextToken)
-    this.docs = new McpClient(config.docsEndpoint, config.contextToken)
+    this.access = config.contextToken ? 'context' : 'public'
+    this.data = config.contextToken ? new McpClient(config.dataEndpoint, config.contextToken) : null
+    this.docs = config.contextToken ? new McpClient(config.docsEndpoint, config.contextToken) : null
     this.knowledgeBaseId = config.knowledgeBaseId
+    this.publicQueryUrl = `https://${config.projectId}.api.sanity.io/v${config.apiVersion}/data/query/${config.dataset}`
   }
 
-  /** Runs GROQ through Context and unwraps the {meta, result} envelope it returns. */
+  /** Runs GROQ, through Context when we have a token and over the public API when we do not. */
   private async query<T>(groq: string): Promise<T> {
-    const raw = await this.data.call('groq_query', {query: groq})
-    try {
-      const parsed = JSON.parse(raw) as {result?: T}
-      return parsed.result as T
-    } catch {
-      throw new Error(`groq_query returned something unparseable: ${raw.slice(0, 200)}`)
+    if (this.data) {
+      const raw = await this.data.call('groq_query', {query: groq})
+      try {
+        return (JSON.parse(raw) as {result?: T}).result as T
+      } catch {
+        throw new Error(`groq_query returned something unparseable: ${raw.slice(0, 200)}`)
+      }
     }
+
+    const url = new URL(this.publicQueryUrl)
+    url.searchParams.set('query', groq)
+    const response = await fetch(url)
+    const payload = (await response.json()) as {result?: T; error?: {description?: string}}
+    if (payload.error) {
+      throw new Error(`public query API: ${payload.error.description ?? JSON.stringify(payload.error)}`)
+    }
+    return payload.result as T
+  }
+
+  private requireDocs(): McpClient {
+    if (!this.docs) {
+      throw new Error(
+        'The knowledge base is served only through Sanity Context, which needs an organisation ' +
+          'token with Context Viewer permission. Set SANITY_CONTEXT_TOKEN in .env. The structured ' +
+          'dataset works without one.',
+      )
+    }
+    return this.docs
   }
 
   /**
@@ -165,13 +203,13 @@ export class ContextClient {
 
   /** The knowledge-base table of contents, as the agent sees it. */
   async outline(): Promise<string> {
-    return this.docs.call('initial_context')
+    return this.requireDocs().call('initial_context')
   }
 
   /** Verbatim prose for one or more entries, with their own Sources blocks intact. */
   async read(paths: string[]): Promise<string> {
     if (paths.length === 0) return ''
-    return this.docs.call('knowledge_base_read', {
+    return this.requireDocs().call('knowledge_base_read', {
       knowledgeBase: this.knowledgeBaseId,
       paths: paths.slice(0, 20),
     })
@@ -196,6 +234,7 @@ export class ContextClient {
   }
 
   async toolNames(): Promise<{data: string[]; docs: string[]}> {
+    if (!this.data || !this.docs) return {data: [], docs: []}
     const [data, docs] = await Promise.all([this.data.tools(), this.docs.tools()])
     return {data: data.map((t) => t.name), docs: docs.map((t) => t.name)}
   }

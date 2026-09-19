@@ -2,7 +2,7 @@ import {createServer} from 'node:http'
 
 import {readConfig} from './config.js'
 import {ContextClient} from './context.js'
-import {renderIndex, renderProfile, escape} from './view.js'
+import {renderIndex, renderProfile, escape, setAccessNote} from './view.js'
 
 /**
  * The read-only viewer. It exists so a judge — or an auditor — can see the same
@@ -15,6 +15,8 @@ import {renderIndex, renderProfile, escape} from './view.js'
 const config = readConfig()
 const context = new ContextClient(config)
 const port = Number(process.env.PORT ?? 4173)
+
+setAccessNote(context.access)
 
 const server = createServer((req, res) => {
   void handle(req.url ?? '/')
