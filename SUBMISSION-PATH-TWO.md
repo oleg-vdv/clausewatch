@@ -4,7 +4,7 @@ published: false
 tags: devchallenge, sanitychallenge, sanity, ai
 ---
 
-*This is a submission for the Sanity Challenge, Path Two: Vibe-Code Something Strange*
+*This is a submission for the [Sanity Challenge, Path Two: Vibe-Code Something Strange](https://dev.to/challenges/sanity-2026-09-16)*
 
 ## What I Built
 
@@ -50,6 +50,11 @@ for both.
 
 The signing desk is where the human side of that boundary lives.
 
+**Who it is for:** whoever ends up holding the compliance file at a small company — usually a
+founder or a lone engineer, not a legal department. They are the ones who get handed an
+auditor's question and have nobody to escalate it to. The agent does the reading; they do the
+deciding, and the point of the desk is that the split is visible rather than assumed.
+
 ## Demo
 
 **The app:** https://www.sanity.io/@o7br4pucm/application/wpdwxiwyygohwmtn59yz92ap
@@ -75,6 +80,11 @@ their name against a reading of the law.
 
 Signing writes the decision and its transition record in one edit, so the state cannot move
 without the evidence of who moved it.
+
+<!-- IMAGE 1: the signing desk. Whole screen at http://localhost:3333 — the rule note at the
+     top, both clauses side by side, the agent's steps, and the form with an empty "Signed by" -->
+
+<!-- IMAGE 2 (cover): just the form — what was decided, why, and the blank signature line -->
 
 ## Code
 
@@ -167,6 +177,22 @@ reads the same public dataset over the query API and says so in the footer and i
 rather than crediting a source it never touched. Then it cloned from GitHub into a temp
 directory and ran it with no credentials to prove the fix, which is the check I would have
 skipped.
+
+### Reaching past the Studio
+
+Both of the things the brief said it wanted to see, and they turned out to be one thing.
+
+The **workflow** came first, because the process already existed and was hiding in an enum:
+a conflict had a `resolution` field and nothing that said who was allowed to set it. Pulling
+it out into states and transitions took an afternoon and immediately paid for itself — the
+agent stopped needing to be told what it may not do, because it could query it.
+
+The **App SDK** app followed from that. Once `review → decided` was marked `human`, there had
+to be somewhere a human makes that move, and the Studio was the wrong place: the Studio is
+where you edit a document, not where you sign one. The app is 200 lines, reads the workflow
+and the conflicts with `useQuery`, and writes with `useEditDocument` and
+`useApplyDocumentActions`. It holds no state of its own, which is the property I wanted —
+close the tab mid-decision and nothing is half-saved.
 
 ### One undocumented thing, for whoever hits it next
 
