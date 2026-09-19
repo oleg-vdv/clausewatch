@@ -223,6 +223,14 @@ in the prose that my dataset had not modelled at all, and said so.
   dataset. The CLI said 18 imported, an authenticated `count(*)` said 31, an anonymous one
   said 0. Sanity treats `_id` as a path and public read covers the root path only. An
   authenticated count is not evidence that your dataset is public.
+
+  Worth watching this one happen, because the numbers are the whole story. The slice below is
+  terminal output: an import that reports success, a document fetch that comes back
+  `{"documents":[],"omitted":[{"reason":"permission"}]}`, a one-document probe with a plain id
+  that proves the ids are the cause, and a final anonymous `count(*)` of 18 after renaming
+  everything to hyphens.
+
+  {% agent_session SLICE_TAG_PUBLIC_DATASET %}
 - **Wildcard include patterns do not filter a website source; exact paths do.** `/article/*`
   pulled 200 pages including Polish and French translations of the same articles. For a legal
   agent a translation is a correctness hazard, not noise — and the sitemap is the tell: if a
@@ -254,7 +262,39 @@ https://4yzoidsq.api.sanity.io/v2026-09-19/data/query/production?query=*[_type==
 
 ## Agent Session
 
-<!-- Upload at https://dev.to/agent_sessions/new, hit Make Public, then embed the liquid tag here. -->
+The whole build is on record — 485 messages in one Claude Code session. A note before you
+open it: I work in Russian, so the conversation is in Russian. Everything that matters here
+is not. The tool calls, the GROQ queries, the MCP traces, the terminal output and the agent's
+own answers are all English, and that is what each slice below is made of. I have said what
+to look for in front of each one.
+
+### The agent refuses to give one number
+
+The question is how long a provider must keep logs for a high-risk biometric system. Watch
+the trace: `initial_context` on the dataset, then on the knowledge base, then a GROQ query it
+writes itself, then two knowledge-base entries, then jurisdictions, then profiles. Seven
+calls across both Context endpoints before it says anything.
+
+Then read the answer. It gives a floor with a citation, a ceiling with a citation, states
+that the conflict between them is unresolved and that nobody is recorded as having decided
+it, and points out that the obligation does not apply until December 2027. It never produces
+the single number the question was fishing for.
+
+{% agent_session SLICE_TAG_AGENT_RUN %}
+
+### Context found a contradiction I had not
+
+This one starts with a Sanity Context issue: an entry says Annex I lists 21 harmonisation
+instruments, the source shows 20. You will see me go to the source rather than take it on
+trust — the `curl` that pulls the annex, the numbered paragraphs it prints, and the moment
+the amendment shows up: item 1 struck, item 21 added.
+
+The end of the slice is the part I would point a judge at. Context also proposed a Section
+A / Section B split, and I could not verify it, because EUR-Lex blocks automated retrieval.
+So the decision recorded in the dataset states the verified part and explicitly excludes the
+rest. Finding disagreement and settling it are different jobs.
+
+{% agent_session SLICE_TAG_ANNEX_I %}
 
 ## Honest limits
 
