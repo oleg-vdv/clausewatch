@@ -222,7 +222,7 @@ prints its numbered paragraphs. Paragraph 5 is the duty to monitor. Paragraph 6 
 keep the logs. That is the whole difference between citing the right clause and the wrong one,
 and nothing short of going to the text would have shown it.
 
-{% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj A one-digit citation error %}
+{% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj a-one-digit-citation-error %}
 
 ### Five things that cost me hours
 
@@ -254,7 +254,7 @@ success, a document fetch that comes back `{"documents":[],"omitted":[{"reason":
 a one-document probe with a plain id that proves the ids are the cause, and a final anonymous
 `count(*)` of 18 once everything was renamed to hyphens.
 
-{% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj A public dataset that wasn't %}
+{% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj a-public-dataset-that-wasnt %}
 
 ## Sanity Project Details
 
@@ -288,7 +288,7 @@ that the conflict between them is unresolved and that nobody is recorded as havi
 it, and points out that the obligation does not apply until December 2027. It never produces
 the single number the question was fishing for.
 
-{% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj The agent refuses to give one number %}
+{% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj the-agent-refuses-to-give-one-number %}
 
 ### The Annex I check, start to finish
 
@@ -302,7 +302,7 @@ A / Section B split, and I could not verify it, because EUR-Lex blocks automated
 So the decision recorded in the dataset states the verified part and explicitly excludes the
 rest. Finding disagreement and settling it are different jobs.
 
-{% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj Context found a contradiction I hadn't %}
+{% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj context-found-a-contradiction-i-hadnt %}
 
 ## Honest limits
 
