@@ -30,6 +30,11 @@ export const styles = `
 
 * { box-sizing: border-box; }
 
+html, body, #root {
+  width: 100%;
+  min-height: 100%;
+}
+
 body {
   margin: 0;
   background: var(--paper);
@@ -37,7 +42,12 @@ body {
   font: 16px/1.55 ui-serif, Georgia, serif;
 }
 
-main { max-width: 46rem; margin: 0 auto; padding: 2rem 1rem 5rem; }
+/* The app mounts into #root inside the dashboard shell. Auto margins on the column
+   alone left it hugging the right edge, so the mount point is centred too and the
+   layout holds wherever this is embedded. */
+#root { display: flex; justify-content: center; }
+
+main { flex: 1 1 auto; max-width: 46rem; margin-inline: auto; padding: 2rem 1rem 5rem; }
 
 h1 { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 1.6rem; margin: 0 0 .5rem; letter-spacing: -.01em; }
 h2 { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 1.15rem; margin: .2rem 0 1rem; line-height: 1.3; }
