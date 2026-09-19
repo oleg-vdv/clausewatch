@@ -222,7 +222,7 @@ prints its numbered paragraphs. Paragraph 5 is the duty to monitor. Paragraph 6 
 keep the logs. That is the whole difference between citing the right clause and the wrong one,
 and nothing short of going to the text would have shown it.
 
-{% agent_session SLICE_TAG_CITATION_ERROR %}
+{% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj A one-digit citation error %}
 
 ### Five things that cost me hours
 
@@ -237,7 +237,7 @@ and nothing short of going to the text would have shown it.
   that proves the ids are the cause, and a final anonymous `count(*)` of 18 after renaming
   everything to hyphens.
 
-  {% agent_session SLICE_TAG_PUBLIC_DATASET %}
+  {% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj A public dataset that wasn't %}
 - **Wildcard include patterns do not filter a website source; exact paths do.** `/article/*`
   pulled 200 pages including Polish and French translations of the same articles. For a legal
   agent a translation is a correctness hazard, not noise — and the sitemap is the tell: if a
@@ -287,7 +287,7 @@ that the conflict between them is unresolved and that nobody is recorded as havi
 it, and points out that the obligation does not apply until December 2027. It never produces
 the single number the question was fishing for.
 
-{% agent_session SLICE_TAG_AGENT_RUN %}
+{% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj The agent refuses to give one number %}
 
 ### Context found a contradiction I had not
 
@@ -301,7 +301,7 @@ A / Section B split, and I could not verify it, because EUR-Lex blocks automated
 So the decision recorded in the dataset states the verified part and explicitly excludes the
 rest. Finding disagreement and settling it are different jobs.
 
-{% agent_session SLICE_TAG_ANNEX_I %}
+{% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj Context found a contradiction I hadn't %}
 
 ## Honest limits
 
