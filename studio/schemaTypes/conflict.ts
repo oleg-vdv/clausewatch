@@ -79,6 +79,21 @@ export const conflict = defineType({
     }),
     defineField({name: 'decidedAt', type: 'datetime'}),
     defineField({
+      name: 'state',
+      type: 'string',
+      description:
+        'Where this sits in the decision workflow. The legal moves out of it, and who may make them, are data — see the workflow document.',
+      initialValue: 'raised',
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: 'history',
+      title: 'How it got here',
+      type: 'array',
+      of: [{type: 'transitionRecord'}],
+      description: 'Every move, with the actor who made it. An auditor asks for this, not for the current state.',
+    }),
+    defineField({
       name: 'supersededBy',
       type: 'reference',
       to: [{type: 'conflict'}],

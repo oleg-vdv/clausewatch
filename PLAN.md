@@ -362,3 +362,41 @@ address; the structured layer carries the address. That is a better argument for
 design than the one we thought we had.
 
 `SUBMISSION.md` has been rewritten to say this rather than the earlier version.
+
+## Path Two groundwork: the process as data (2026-09-19)
+
+The challenge names this as a bonus it especially wants to see — "model a process as data
+next to the content, so an agent can move a draft forward and a person can approve it through
+the same transitions". Our conflict resolution already *was* such a process; it was just
+implicit in a `resolution` enum.
+
+New types: `workflow` (states + transitions), `workflowState`, `transition`, and
+`transitionRecord`. A conflict now carries `state` and a `history[]` of moves with the actor
+who made each one.
+
+The field the design rests on is `transition.actor`. Two of five moves are open to an agent —
+start looking, attach the sources. Three are `human`, including the one that matters:
+
+```
+CANNOT Sign the decision (review → decided) — reserved for a person
+       Only a person signs. The agent can prepare every part of this and still not
+       make the move.
+```
+
+The agent is refused **by the dataset it queries**, not by a sentence in its prompt. Same
+data a person reads in the Studio, same transitions, different permissions — and the
+difference is queryable: `count(transitions[actor=="human"])` returns 3 over the public API.
+
+`agent/src/gate.ts` computes the allowed moves; `npm run ask -- --workflow [--as human]`
+prints them. The same transition blocks the two actors for different reasons: the agent is
+told it is reserved for a person, the person is told which fields are still empty.
+
+Three conflicts sit at three points on purpose: one raised, one awaiting a signature, one
+decided with its full history.
+
+## Next for Path Two
+
+An App SDK app where a person makes the `review → decided` move: `npx sanity@latest init
+--template app-quickstart`, then `sanity deploy`. Deploying needs org admin or a token with
+**Manage SDK Apps** — the current deploy token has Deploy Studios only, so that permission
+has to be added before the app can ship.

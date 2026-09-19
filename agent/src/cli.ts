@@ -4,6 +4,7 @@ import {readConfig} from './config.js'
 import {ContextClient} from './context.js'
 import {renderReport} from './report.js'
 import {ask} from './agent.js'
+import {describeMoves} from './gate.js'
 
 /**
  * clausewatch — ask what a system actually has to do, and where the sources disagree.
@@ -22,6 +23,8 @@ const HELP = `clausewatch
   --no-llm            deterministic report straight from the dataset, no API key needed
   --profiles          list the system profiles in the dataset
   --check             verify both MCP endpoints answer
+  --workflow          the decision process, and what each actor may do next
+  --as <agent|human>  which actor to show the workflow for (default: agent)
   --out <file>        save the run, with its tool calls, as markdown
   "<question>"        free-form question, answered by the agent over both endpoints
 `
@@ -35,7 +38,7 @@ async function main(): Promise<void> {
 
   const config = readConfig()
   // Flags that take a value, so their value is not mistaken for part of the question.
-  const valued = new Set(['profile', 'topic', 'out'])
+  const valued = new Set(['profile', 'topic', 'out', 'as'])
 
   const flag = (name: string): string | undefined => {
     const index = argv.indexOf(`--${name}`)
@@ -76,6 +79,18 @@ async function main(): Promise<void> {
         `${profile.slug}\n  ${profile.name}\n  ${profile.roles.join(', ')} · ${profile.riskClass} · ${profile.jurisdictions.join(', ')}\n`,
       )
     }
+    return
+  }
+
+  if (has('workflow')) {
+    const [workflow, progress] = await Promise.all([context.workflow(), context.progress()])
+    if (!workflow) throw new Error('No workflow document governs conflicts in this dataset.')
+
+    const actor = flag('as') === 'human' ? 'human' : 'agent'
+    const states = workflow.states.map((s) => `  ${s.key.padEnd(11)} ${s.title}`).join('\n')
+    const bodies = progress.map((conflict) => describeMoves(workflow, conflict, actor))
+
+    process.stdout.write([`${workflow.name} — as the ${actor}`, states, ...bodies].join('\n\n') + '\n')
     return
   }
 

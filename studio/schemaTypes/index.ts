@@ -6,6 +6,10 @@ import {requirement} from './requirement'
 import {role} from './role'
 import {source} from './source'
 import {systemProfile} from './systemProfile'
+import {transition} from './transition'
+import {transitionRecord} from './transitionRecord'
+import {workflow} from './workflow'
+import {workflowState} from './workflowState'
 
 export const schemaTypes = [
   // documents
@@ -16,6 +20,10 @@ export const schemaTypes = [
   systemProfile,
   role,
   jurisdiction,
+  workflow,
   // objects
   claim,
+  workflowState,
+  transition,
+  transitionRecord,
 ]

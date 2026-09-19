@@ -38,6 +38,36 @@ export interface Requirement {
   conflicts: Conflict[]
 }
 
+export interface WorkflowState {
+  key: string
+  title: string
+  description: string | null
+  isTerminal: boolean | null
+}
+
+export interface Transition {
+  label: string
+  from: string
+  to: string
+  actor: 'agent' | 'human' | 'either'
+  requires: string[] | null
+  note: string | null
+}
+
+export interface Workflow {
+  name: string
+  states: WorkflowState[]
+  transitions: Transition[]
+}
+
+export interface ConflictProgress {
+  id: string
+  summary: string
+  state: string
+  history: Array<{at: string; from: string | null; to: string; actorKind: string; actor: string; note: string | null}>
+  filled: string[]
+}
+
 export interface Profile {
   name: string
   slug: string
@@ -193,6 +223,34 @@ export class ContextClient {
       "claims": claims[${claimFilter}]${CLAIM_PROJECTION},
       "conflicts": conflicts[]->${CONFLICT_PROJECTION}
     }[count(claims) > 0]`)
+  }
+
+  /** The process that governs conflicts, stored beside them rather than in this code. */
+  async workflow(): Promise<Workflow | null> {
+    const rows = await this.query<Workflow[]>(`*[_type == "workflow" && appliesTo == "conflict"]{
+      name,
+      "states": states[]{key, title, description, isTerminal},
+      "transitions": transitions[]{label, from, to, actor, requires, note}
+    }`)
+    return rows[0] ?? null
+  }
+
+  /** Where each conflict sits, how it got there, and which required fields are filled. */
+  async progress(): Promise<ConflictProgress[]> {
+    return this.query<ConflictProgress[]>(`*[_type == "conflict"]{
+      "id": _id,
+      summary,
+      "state": coalesce(state, "raised"),
+      "history": coalesce(history[]{at, from, to, actorKind, actor, note}, []),
+      "filled": [
+        select(defined(rationale) => "rationale", null),
+        select(defined(decidedBy) => "decidedBy", null),
+        select(defined(decidedAt) => "decidedAt", null),
+        select(count(sides) > 0 => "sides", null),
+        select(defined(nature) => "nature", null),
+        select(defined(supersededBy) => "supersededBy", null)
+      ][defined(@)]
+    } | order(state)`)
   }
 
   async conflicts(): Promise<Conflict[]> {
