@@ -125,8 +125,11 @@ p { margin: 0 0 .85rem; }
   font-family: "Familjen Grotesk", sans-serif; font-size: .8125rem; color: var(--ink-soft);
   padding: 0 1rem; text-align: center;
 }
-.pressure-ends { display: flex; justify-content: space-between; gap: 1rem; margin-top: .45rem; }
-.pressure-ends span { font-size: .6875rem; line-height: 1.35; font-family: "JetBrains Mono", monospace; flex: 0 1 48%; }
+.pressure-ends { display: flex; justify-content: space-between; gap: 1.5rem; margin-top: .5rem; }
+.pressure-ends span { font-size: .75rem; line-height: 1.45; font-family: "JetBrains Mono", monospace; flex: 0 1 46%; }
+/* Value on one line, citation under it: a wrap that lands mid-citation reads as a mistake. */
+.pressure-ends b { display: block; font-weight: 500; font-size: .8125rem; }
+.pressure-ends .cite-under { opacity: .85; }
 .pressure-ends .lo { color: var(--floor); }
 .pressure-ends .hi { color: var(--ceiling); text-align: right; }
 
@@ -323,12 +326,18 @@ function renderPressure(floors: Claim[], ceilings: Claim[]): string {
   const floor = floors[0]
   const ceiling = ceilings[0]
 
+  const stack = (value: string, cite: string) =>
+    `<b>${escape(value)}</b><span class="cite-under">${escape(cite)}</span>`
+
   const low = floor
-    ? `at least ${floor.retentionMonths ?? '—'} months · ${floor.cite}`
-    : 'no minimum in these sources'
+    ? stack(`at least ${floor.retentionMonths ?? '—'} months`, floor.cite)
+    : '<b>no minimum</b><span class="cite-under">nothing in these sources sets one</span>'
   const high = ceiling
-    ? `${ceiling.retentionMonths === null ? 'no stated number' : `at most ${ceiling.retentionMonths} months`} · ${ceiling.cite}`
-    : 'no cap in these sources'
+    ? stack(
+        ceiling.retentionMonths === null ? 'no stated number' : `at most ${ceiling.retentionMonths} months`,
+        ceiling.cite,
+      )
+    : '<b>no cap</b><span class="cite-under">nothing in these sources sets one</span>'
 
   const middle =
     floor && ceiling
@@ -341,8 +350,8 @@ function renderPressure(floors: Claim[], ceilings: Claim[]): string {
     <p class="eyebrow">How long</p>
     <div class="pressure-bar" data-middle="${escape(middle)}"></div>
     <div class="pressure-ends">
-      <span class="lo">${escape(low)}</span>
-      <span class="hi">${escape(high)}</span>
+      <span class="lo">${low}</span>
+      <span class="hi">${high}</span>
     </div>
     ${floor && ceiling ? `<p class="note" style="margin-top:.6rem">The hatched end has no edge because no text draws one. ${escape(ceiling.cite)} caps the period by necessity without naming a number.</p>` : ''}
   </div>`
