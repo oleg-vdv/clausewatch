@@ -230,14 +230,6 @@ and nothing short of going to the text would have shown it.
   dataset. The CLI said 18 imported, an authenticated `count(*)` said 31, an anonymous one
   said 0. Sanity treats `_id` as a path and public read covers the root path only. An
   authenticated count is not evidence that your dataset is public.
-
-  Worth watching this one happen, because the numbers are the whole story. The slice below is
-  terminal output: an import that reports success, a document fetch that comes back
-  `{"documents":[],"omitted":[{"reason":"permission"}]}`, a one-document probe with a plain id
-  that proves the ids are the cause, and a final anonymous `count(*)` of 18 after renaming
-  everything to hyphens.
-
-  {% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj A public dataset that wasn't %}
 - **Wildcard include patterns do not filter a website source; exact paths do.** `/article/*`
   pulled 200 pages including Polish and French translations of the same articles. For a legal
   agent a translation is a correctness hazard, not noise — and the sitemap is the tell: if a
@@ -254,6 +246,15 @@ and nothing short of going to the text would have shown it.
 And one that is nobody's fault but mine: `count()` of a missing field is **null, not 0**, so a
 role filter written as `count(appliesToRoles) == 0` for *binds everyone* silently dropped every
 GDPR claim. It looked fine in the provider's report and only broke for the deployer.
+
+### Watching the first one happen
+
+The numbers are the whole story, so here is the terminal output: an import that reports
+success, a document fetch that comes back `{"documents":[],"omitted":[{"reason":"permission"}]}`,
+a one-document probe with a plain id that proves the ids are the cause, and a final anonymous
+`count(*)` of 18 once everything was renamed to hyphens.
+
+{% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj A public dataset that wasn't %}
 
 ## Sanity Project Details
 
