@@ -81,10 +81,9 @@ their name against a reading of the law.
 Signing writes the decision and its transition record in one edit, so the state cannot move
 without the evidence of who moved it.
 
-<!-- IMAGE 1: the signing desk. Whole screen at http://localhost:3333 — the rule note at the
-     top, both clauses side by side, the agent's steps, and the form with an empty "Signed by" -->
+![The signing desk: a note saying only a person signs, the two conflicting clauses side by side with their citations, the two steps the agent already took, and a form with an empty signature line.](https://dev-to-uploads.s3.us-east-2.amazonaws.com/uploads/articles/9icb3896gf0j9e4ac4v2.png)
 
-<!-- IMAGE 2 (cover): just the form — what was decided, why, and the blank signature line -->
+![The signing form: a dropdown for what was decided, a box for why, and a blank line labelled 'Signed by'.](https://dev-to-uploads.s3.us-east-2.amazonaws.com/uploads/articles/zfdl3spqrexsbkagmq0f.JPG)
 
 ## Code
 
