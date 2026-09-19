@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {useApplyDocumentActions, useEditDocument, publishDocument} from '@sanity/sdk-react'
+import {useApplyDocumentActions, useDocument, useEditDocument, publishDocument} from '@sanity/sdk-react'
 
 /**
  * One conflict, both clauses, and the form that makes the move the agent cannot.
@@ -33,6 +33,9 @@ const RESOLUTIONS: Array<{value: Resolution; label: string}> = [
 
 export function ConflictCard({conflict, onSigned}: Props) {
   const handle = {documentId: conflict._id, documentType: 'conflict'}
+  // Subscribing here is not decoration: without it the edit store has no value for
+  // this document yet and the updater is handed undefined on the first write.
+  const {data: current} = useDocument(handle)
   const edit = useEditDocument(handle)
   const apply = useApplyDocumentActions()
 
@@ -55,14 +58,14 @@ export function ConflictCard({conflict, onSigned}: Props) {
       // One edit: the decision and the transition record, so the state never
       // moves without the evidence of who moved it.
       await edit((doc) => ({
-        ...doc,
+        ...(doc ?? current ?? {}),
         state: 'decided',
         resolution,
         rationale: rationale.trim(),
         decidedBy: name.trim(),
         decidedAt: at,
         history: [
-          ...((doc.history as unknown[] | undefined) ?? []),
+          ...(((doc ?? current)?.history as unknown[] | undefined) ?? []),
           {
             _key: `h-decided-${at}`,
             _type: 'transitionRecord',
