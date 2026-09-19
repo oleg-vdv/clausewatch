@@ -188,18 +188,34 @@ part, explicitly excludes the unverified arithmetic, and carries a name and a da
 That is the whole product in one incident. Automated detection is good at *finding*
 disagreement and is not authoritative about *resolving* it.
 
-### An Instruction closed the loop the other way
+### Where prose alone gets a citation wrong
 
-In one run the agent cited **Art. 26(5)** for the deployer's log duty, taken from the
+In one run the agent cited **Art. 26(5)** for the deployer's log-retention duty, from the
 knowledge base. The source says **Art. 26(6)**; 26(5) is the monitoring duty. A one-digit
-citation error that reads as correct.
+error that reads as correct.
 
-The fix was a Context Instruction correcting the fact at the source — *honored on every build,
-over the raw sources* — rather than a patch in my code. Art. 26(6) is now a provision in the
-dataset with a verified citation, and the two layers agree again.
+Chasing it was the most useful hour of the build. The knowledge-base entry for Article 26
+numbers its own sections, and the fifth one is headed `### 5. Log retention`. Section five of
+an entry about Article 26 — and a model reading it produced "Art. 26(5)". The entry states the
+rule itself correctly, and **gives no paragraph number at all**:
 
-They check each other in both directions: in another run the agent found a duty present in the
-prose that my dataset had not modelled at all, and said so.
+> Deployers shall keep automatically generated logs for a period appropriate to the intended
+> purpose, with a minimum of six months, unless applicable Union or national law … provides
+> otherwise.
+
+That is the argument for two layers rather than one. Prose is right about the *rule* and
+silent on the *address*; the dataset carries the address, verified by a human against the
+source. Art. 26(6) is now a provision with the checked citation, its own claim on the
+retention requirement, and the role it binds — which is why a deployer profile is shown
+Art. 26(6) and a provider Art. 19.
+
+I also added a Context **Instruction**, which is *honored on every build, over the raw
+sources*, so a future rebuild cannot reintroduce the wrong number. Being precise about what
+I have and have not verified: that Instruction has not been exercised yet. The corpus has not
+changed since, so Context reports entries up to date and no rebuild has run.
+
+The layers check each other in both directions. In another run the agent found a duty present
+in the prose that my dataset had not modelled at all, and said so.
 
 ### Five things that cost me hours
 

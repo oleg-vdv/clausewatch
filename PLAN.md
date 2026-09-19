@@ -338,3 +338,27 @@ citation, keeps a decision block from splitting across pages, and drops to black
 
 A printed report is the form this work ends up in when someone hands it to an auditor. It has
 to survive the printer.
+
+## Correction: the Art. 26(5) story (2026-09-19)
+
+Verified after the corpus rebuild, and the earlier account in this file was wrong.
+
+The agent's mis-citation came from the **old** knowledge base (`kbUe23mmKTBM`), which we
+deleted. The rebuilt one (`kboZJwjuj070`) does not make that claim: its only mention of
+Art. 26(5) is correct — the cross-reference from Art. 12(2)(c) to deployer monitoring.
+
+The likely cause is now visible. The entry for Article 26 numbers its own sections, and the
+fifth is headed `### 5. Log retention`. Section five of an entry about Article 26 reads, to a
+model, as Art. 26(5). The entry states the rule correctly and gives **no paragraph number**,
+so there was nothing in the prose to contradict the inference.
+
+So the Instruction did not fix anything: it guards against the wrong number returning on a
+future build. `Check for changes` reports "Entries up to date" — the sources have not changed,
+no rebuild has run, and the Instruction is therefore untested.
+
+What actually fixed the answer is the dataset: Art. 26(6) is a provision with a human-verified
+citation and a deployer claim. The prose layer is right about the rule and silent on the
+address; the structured layer carries the address. That is a better argument for the two-layer
+design than the one we thought we had.
+
+`SUBMISSION.md` has been rewritten to say this rather than the earlier version.
