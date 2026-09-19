@@ -40,11 +40,14 @@ changes when the dataset does.
 
 ```bash
 git clone https://github.com/oleg-vdv/clausewatch && cd clausewatch/agent
-cp ../.env.example ../.env    # add an org token with Context Viewer permission
 npm install && npm run web    # http://localhost:4173
 ```
 
-No login. No API key needed for the viewer or for `--no-llm`.
+**No credentials.** No login, no token, no API key. The dataset is public, so a fresh clone
+reads it over the public query API and the viewer renders the full report. The knowledge base
+and the agent need a Context token, which you cannot have — so `--check` and the page footer
+say exactly which of the two sources the answer came from, instead of crediting one it never
+touched.
 
 The layout borrows from consolidated legal texts rather than dashboards: a marginal column
 carries what a lawyer writes in the margin — which party the duty binds, when it starts to

@@ -75,26 +75,41 @@ that shows both sides and cites a named, dated decision produces something an au
 
 ## Run it
 
-```bash
-cp .env.example .env     # fill in SANITY_CONTEXT_TOKEN (org token, Context Viewer permission)
-cd agent && npm install
-```
+No credentials required. The dataset is public, so this works on a fresh clone:
 
 ```bash
-npm run ask -- --check                              # both endpoints answer
+cd agent && npm install
+
+npm run ask -- --check                              # what this clone can reach
 npm run ask -- --profiles                           # system profiles in the dataset
-npm run ask -- --profile biometric-access --no-llm  # full report, no API key needed
-npm run ask -- "how long must I keep logs for a high-risk biometric system?"
+npm run ask -- --profile biometric-access --no-llm  # the full report
+npm run ask -- --profile support-agent --no-llm     # the same ground for a deployer
 npm run web                                         # the viewer, http://localhost:4173
 ```
 
-`--no-llm` composes the answer straight from the dataset with no model involved. It is there
-so the project can be checked without an Anthropic key, and so the LLM path has something to
-be measured against: if the model says six months with the same citation the report gives, it
-did not invent the number.
+`--no-llm` composes the answer straight from the dataset with no model involved. It exists so
+the project can be checked by anyone, and so the LLM path has something to be measured
+against: if the model says six months with the same citation the report gives, it did not
+invent the number.
 
-The LLM path needs `ANTHROPIC_API_KEY`. It is a real tool-use loop — every tool is a live
-Context MCP tool, nothing is pre-fetched, and the model has to go and look.
+### With credentials
+
+Two capabilities need them, and the project says so rather than degrading quietly.
+
+| | Needs | Why |
+|---|---|---|
+| Structured dataset | nothing | the dataset is public; read over the public query API |
+| Knowledge base | `SANITY_CONTEXT_TOKEN` | served only through Sanity Context |
+| The agent | that, plus `ANTHROPIC_API_KEY` | it is a tool-use loop over both MCP endpoints |
+
+```bash
+cp .env.example .env    # org token with Context Viewer permission, not a project token
+npm run ask -- "how long must I keep logs for a high-risk biometric system?"
+```
+
+With a token the same commands run through the Context MCP endpoints instead — `--check`
+and the viewer's footer both say which way the data came in. That distinction is not
+decoration: a page that credits a source it never read is the failure this project is about.
 
 Saved runs, with their tool calls attached, are in [`demo/`](demo).
 
