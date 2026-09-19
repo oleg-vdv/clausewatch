@@ -4,85 +4,79 @@ published: false
 tags: sanitychallenge, devchallenge, agents, ai
 ---
 
-*This is a submission for the [Sanity Challenge](https://dev.to/devteam/join-the-sanity-challenge-2500-in-prizes-for-five-winners-514m): Ship an agent that queries real content.*
+*This is a submission for the [Sanity Challenge, Path One: Ship an Agent That Queries Real Content](https://dev.to/challenges/sanity-2026-09-16)*
 
 ## What I Built
 
 Ask any model how long you must keep AI system logs under the EU AI Act. It will say six
 months. That is true, and it is not the answer.
 
-**AI Act Art. 19** makes the *provider* keep logs at least six months. **Art. 26(6)** puts the
-same floor on the *deployer* — a separate duty on a separate party. **GDPR Art. 5(1)(e)** says
-personal data may be kept no longer than necessary, and names no number at all. And **Art.
-12(3)** guarantees the two will collide: for biometric systems the log is *required* to record
-the identity of the humans who verified a match, so the log the AI Act mandates is personal
-data by construction.
+- **AI Act Art. 19** makes the **provider** keep logs at least six months.
+- **AI Act Art. 26(6)** puts the same floor on the **deployer** — a separate duty on a
+  separate party.
+- **GDPR Art. 5(1)(e)** says personal data may be kept **no longer than necessary**, and
+  names no number at all.
+- **AI Act Art. 12(3)** guarantees the collision: for biometric systems the log is *required*
+  to record the identity of the humans who verified a match. The log the AI Act mandates is
+  personal data by construction.
 
 One instrument sets a floor. Another sets a ceiling. Neither says where the other one sits.
 The honest answer is a period you can justify against both — plus a record of who decided it.
 
-ClauseWatch is an agent that gives that answer. It reads a structured model of obligations and
-the prose of the instruments behind them, and when two sources pull in opposite directions it
-shows both with their citations and reports that the decision is **unmade**:
+ClauseWatch gives that answer. It reads a structured model of obligations and the prose of the
+instruments behind them, and when two sources pull in opposite directions it shows both with
+their citations and reports that the decision is **unmade**:
 
 > Both clauses stand until someone signs. The dataset keeps a `decidedBy` and a `decidedAt`
 > field for exactly that, and they are empty.
 
 This is the part that needed structured content. A keyword search over the same texts returns
 Art. 19 and stops. It cannot know that a clause in a *different regulation* constrains the
-same artifact from the opposite direction, because that fact does not live in either document.
-It lives in the relationship between them — which is to say, in the schema.
+same artifact from the opposite direction, because that fact is not inside either document.
+It is in the relationship between them — which is to say, in the schema.
 
 ## Demo
 
-The viewer is server-rendered from the two Context endpoints; nothing is cached, so the page
-changes when the dataset does.
-
 ```bash
 git clone https://github.com/oleg-vdv/clausewatch && cd clausewatch/agent
-npm install && npm run web    # http://localhost:4173
+npm install && npm run web       # http://localhost:4173
 ```
 
 **No credentials.** No login, no token, no API key. The dataset is public, so a fresh clone
-reads it over the public query API and the viewer renders the full report. The knowledge base
-and the agent need a Context token, which you cannot have — so `--check` and the page footer
-say exactly which of the two sources the answer came from, instead of crediting one it never
+reads it over the public query API and renders the full report. The knowledge base and the
+LLM agent do need a Context token, which you cannot have — so `--check` and the page footer
+say which of the two sources the answer came from, rather than crediting one they never
 touched.
 
-The layout borrows from consolidated legal texts rather than dashboards: a marginal column
-carries what a lawyer writes in the margin — which party the duty binds, when it starts to
-bite — and citations are set in monospace because a citation is an address.
+It also runs with no model at all:
 
-Two elements do the arguing:
+```bash
+npm run ask -- --profile biometric-access --no-llm   # provider, high-risk, KZ → EU
+npm run ask -- --profile support-agent --no-llm      # deployer, risk class unset
+```
 
-**The pressure bar.** A solid edge on the left where Art. 19 states six months; a hatched,
-edgeless right where the GDPR caps the period without naming one. Drawing a tidy range there
-would be a lie about the law.
+Two elements of the viewer do the arguing.
 
-**The signature block.** Every conflict prints a *decided by* and a *date* rule. Resolved,
-they carry a name and a date. Open, they are two empty lines in a compliance report. That is
-the whole thesis rendered as a form field instead of argued in a paragraph.
+**The pressure bar** — a solid edge on the left where Art. 19 states six months, and a
+hatched, edgeless right where the GDPR caps the period without naming one. Drawing a tidy
+range there would be a lie about the law.
 
-The Studio is deployed at **https://clausewatch.sanity.studio/** — open conflicts first,
-because that is the one thing an editor of this dataset actually does.
+**The signature block** — every conflict prints a *decided by* and a *date* rule. Resolved,
+they carry a name and a date. Open, they are two empty lines in a compliance report. The
+thesis as a form field rather than a paragraph.
+
+The Studio is live at **https://clausewatch.sanity.studio/**, with open conflicts on the first
+screen, because that is the one thing an editor of this dataset actually does.
 
 ## Code
 
 **https://github.com/oleg-vdv/clausewatch**
 
-Two Sanity Context MCP endpoints, doing different jobs:
-
-| Endpoint | Mode | Answers |
-|---|---|---|
-| `clausewatch-data` | GROQ over the dataset | *which* obligations bind this system |
-| `clausewatch-docs` | Knowledge Base | *what the clause says*, with its source link |
-
-The agent (`agent/src/agent.ts`) is a tool-use loop where every tool is a live Context MCP
-tool. Nothing is pre-fetched: the model calls `initial_context`, writes its own GROQ, and
-reads knowledge-base entries. There is also a deterministic path (`--no-llm`) that composes
-the same answer from the dataset with no model involved — so the project can be checked
-without an API key, and so the LLM path has something to be measured against. If the model
-says six months with the same citation the deterministic report gives, it did not invent it.
+```
+studio/   schema, desk structure, seed dataset
+agent/    MCP client, domain layer, LLM agent, deterministic report, viewer
+demo/     saved runs with their tool calls attached
+```
 
 ### The content model
 
@@ -102,10 +96,9 @@ Three decisions carry the weight.
 **Claims sit apart from requirements.** One obligation, many instruments, and disagreement
 between them is content — not a data-quality problem to be cleaned up.
 
-**`direction` on a claim.** An earlier version bucketed claims by "does it state a number",
-which filed GDPR Art. 5(1)(e) under *silence*. It is not silent: it caps the period without
-naming one. Floor, ceiling and duty-only are three different answers, and the field is what
-makes the agent able to say so.
+**`direction` on a claim.** An earlier version bucketed claims by *does it state a number*,
+which filed GDPR Art. 5(1)(e) under silence. It is not silent: it caps the period without
+naming one. Floor, ceiling and duty-only are three different answers.
 
 **A conflict holds a decision, not a resolution rule.** An agent that silently picks the
 stricter number is guessing on your behalf. One that shows both sides and cites a named,
@@ -113,76 +106,146 @@ dated decision produces something an auditor can accept.
 
 ## How I Used Sanity
 
-**Knowledge Bases.** A curated corpus of 26 documents: the AI Act articles and annexes that
-bear on the modelled obligations, plus five GDPR articles, indexed into 10 entries. The
-indexing was better than I expected — entries are topic nodes, not chunks, each with an
-article range, a topic list, cross-references (`excludes: … see <other entry>`) and a numbered
-Sources block with a URL per statement.
+### What I pointed Sanity Context at
 
-**Context found a real contradiction I had not.** While indexing, it flagged that an entry
-claimed Annex I lists 21 harmonisation instruments while the source shows 20 — item 1 deleted
-by amendment, item 21 added. I verified it: true. It also proposed a Section A/B split that I
-could *not* verify, because EUR-Lex blocks automated retrieval. So the decision recorded in
-the dataset says the detection was right, states only the verified part, and explicitly
-excludes the unverified arithmetic — and carries a name, because someone chose that.
+Two website sources, both crawled to exact paths rather than wildcards:
 
-That is the whole product in one incident: automated detection is good at *finding*
-disagreement and not authoritative about *resolving* it.
+| Source | Paths | Documents |
+|---|---|---|
+| artificialintelligenceact.eu | Arts. 3, 6, 9, 11–14, 16–21, 26, 27, 72, 73, 99 and Annexes I, III, IV | 21 |
+| gdpr-info.eu | Arts. 5, 17, 25, 30, 32 | 5 |
 
-**Instructions closed the loop the other way.** In one run the agent cited Art. 26(5) for the
-deployer log duty, taken from the knowledge base. The source says Art. 26(6); 26(5) is the
-monitoring duty. A one-digit citation error that reads as correct. The fix was a Context
-Instruction correcting the fact at the source, not a patch in my code — and Art. 26(6) is now
-a provision in the dataset with a verified citation.
+26 documents, indexed into **10 entries**. Curated on purpose — and also capped, because the
+Context beta allows 150 indexed documents on this plan and I hit that twice before narrowing
+properly.
 
-**GROQ mode does the reasoning.** Claims are filtered by the jurisdictions a system touches
-*and* the roles it holds, so a deployer is shown Art. 26(6) and a provider Art. 19. Telling a
-deployer that Art. 19 is their duty is not a rounding error; it is the wrong party.
+The indexing surprised me. Entries are topic nodes rather than chunks: each carries an article
+range, a topic list, cross-references (`excludes: … see <other entry>`) and a numbered Sources
+block with a URL behind every statement.
+
+### Which Context tools I used
+
+Two endpoints, because **one endpoint serves one mode**. Attaching a Knowledge Base to an
+endpoint that already served a dataset replaced the GROQ tools entirely.
+
+| Endpoint | Tools | Job |
+|---|---|---|
+| `clausewatch-data` | `initial_context`, `groq_query`, `schema_explorer`, `array_field_reader` | *which* obligations bind this system |
+| `clausewatch-docs` | `initial_context`, `knowledge_base_read` | *what the clause says*, with its source link |
+
+Both carry the same endpoint Instructions — the citation discipline the agent must follow,
+delivered before it sees any data. The rule that matters most:
+
+> Never fill a gap from your own legal knowledge. If it is not in the dataset or the knowledge
+> base, say that it is not there.
+
+Beyond the tools I leaned on two Context features: **Issues**, which surfaced a contradiction
+in the corpus, and **Instructions**, which corrected a fact at the source instead of in my
+code. Both stories are below.
+
+### What the agent actually did with it
+
+A real tool-use loop. Nothing is pre-fetched: the model gets the two endpoints and has to go
+and look. A typical run:
+
+```
+1. initial_context         (dataset — schema and the citation rules)
+2. kb_initial_context      (knowledge base — the outline of 10 entries)
+3. groq_query              (the logging requirement, its claims, its conflicts)
+4. kb_knowledge_base_read  (design_documentation, post_market_obligations)
+5. groq_query              (jurisdictions, extraterritoriality)
+6. kb_knowledge_base_read  (high_risk_categories)
+7. groq_query              (system profiles)
+```
+
+Seven calls across both endpoints. The answer states it cannot give one number, shows the
+floor and the ceiling with citations and effective dates, reports the conflict as open with
+nobody named, and notes the obligation does not bite until 2 December 2027. In a second run
+the agent found the matching system profile unprompted, treated `riskClass: unknown` as
+load-bearing, separated provider duties from deployer ones, and closed with a section titled
+*What I can't answer from these sources*.
+
+Saved runs with their tool calls are in
+[`demo/`](https://github.com/oleg-vdv/clausewatch/tree/main/demo). The answer alone cannot
+show that a number came from the endpoints rather than from the model, so the tool calls
+travel with it.
+
+The dataset side does the reasoning that a prose search cannot: claims are filtered by the
+jurisdictions a system touches **and** the roles it holds, so a deployer is shown Art. 26(6)
+and a provider Art. 19. Telling a deployer that Art. 19 is their duty is not a rounding error,
+it is the wrong party.
+
+### Context found a contradiction I had not
+
+While indexing, Context flagged that an entry claimed Annex I lists 21 harmonisation
+instruments while the source shows 20 — item 1 deleted by amendment, item 21 added. I checked
+against the source: true. It also proposed a Section A/B split that I could **not** verify,
+because EUR-Lex blocks automated retrieval.
+
+So the decision recorded in the dataset says the detection was right, states only the verified
+part, explicitly excludes the unverified arithmetic, and carries a name and a date.
+
+That is the whole product in one incident. Automated detection is good at *finding*
+disagreement and is not authoritative about *resolving* it.
+
+### An Instruction closed the loop the other way
+
+In one run the agent cited **Art. 26(5)** for the deployer's log duty, taken from the
+knowledge base. The source says **Art. 26(6)**; 26(5) is the monitoring duty. A one-digit
+citation error that reads as correct.
+
+The fix was a Context Instruction correcting the fact at the source — *honored on every build,
+over the raw sources* — rather than a patch in my code. Art. 26(6) is now a provision in the
+dataset with a verified citation, and the two layers agree again.
+
+They check each other in both directions: in another run the agent found a duty present in the
+prose that my dataset had not modelled at all, and said so.
 
 ### Five things that cost me hours
 
 - **Document ids containing dots are invisible to anonymous readers**, even in a public
-  dataset. The CLI said 18 imported, an authenticated `count(*)` said 31, and an anonymous one
+  dataset. The CLI said 18 imported, an authenticated `count(*)` said 31, an anonymous one
   said 0. Sanity treats `_id` as a path and public read covers the root path only. An
   authenticated count is not evidence that your dataset is public.
 - **Wildcard include patterns do not filter a website source; exact paths do.** `/article/*`
-  pulled 200 pages including Polish and French translations. For a legal agent a translation
-  is a correctness hazard, not noise. The tell: the site's sitemaps are English-only, so a
-  crawl returning more pages than the sitemap has followed in-page language links.
-- **"Sitemap only" overrides include patterns** rather than narrowing them — 691 documents.
+  pulled 200 pages including Polish and French translations of the same articles. For a legal
+  agent a translation is a correctness hazard, not noise — and the sitemap is the tell: if a
+  crawl returns more pages than the sitemap lists, it followed in-page language links.
+- **"Sitemap only" overrides include patterns** rather than narrowing them. 691 documents.
 - **An entry outlives its sources.** Delete a source and the prose stays while every citation
   becomes `_source no longer available` — and the entry is still listed in `initial_context`
-  for the agent to read and cite. Dismissing the issue keeps the entry.
+  for the agent to read and cite. Dismissing the issue keeps the entry; only a rebuild cleared
+  them.
 - **Context rewrites your GROQ**, which changes result shapes: `roles[]->name` comes back as
   `[{name, _id}]`. It also injects `_type != "sanity.agentContext"` and pins
-  `perspective: published`.
+  `perspective: published`. Worth knowing when a query behaves differently in Vision.
+
+And one that is nobody's fault but mine: `count()` of a missing field is **null, not 0**, so a
+role filter written as `count(appliesToRoles) == 0` for *binds everyone* silently dropped every
+GDPR claim. It looked fine in the provider's report and only broke for the deployer.
 
 ## Sanity Project Details
 
 - **Project ID:** `4yzoidsq`
 - **Dataset:** `production` (public)
-- **Public dataset URL:** https://4yzoidsq.api.sanity.io/v2026-09-19/data/query/production?query=*%5B_type%3D%3D%22conflict%22%5D
 - **Studio:** https://clausewatch.sanity.studio/
 
-Try the conflicts straight from the API, no token:
+Public dataset, no token — every conflict, both sides, with its decision:
 
 ```
-*[_type=="conflict"]{summary, nature, resolution, decidedBy,
-  "sides": sides[]->{"cite": source->shortName + " " + citation}}
+https://4yzoidsq.api.sanity.io/v2026-09-19/data/query/production?query=*[_type=="conflict"]{summary,nature,resolution,decidedBy,"sides":sides[]->{"cite":source->shortName+" "+citation}}
 ```
 
 ## Agent Session
 
-`<embed the uploaded Claude Code session here>`
+<!-- Upload at https://dev.to/agent_sessions/new, hit Make Public, then embed the liquid tag here. -->
 
 ## Honest limits
 
 The knowledge base is built from authoritative reproductions, not the Official Journal —
 EUR-Lex blocks automated retrieval. Every `source` carries an `officialUrl` and the agent is
-instructed to give that one for anything actionable.
+instructed to give that one for anything the reader will act on.
 
-The corpus is deliberately small, and also capped: the Context beta allows 150 indexed
-documents on this plan, which I hit twice before curating properly.
-
-Two instruments, two profiles, three conflicts. A working core, not a compliance product.
-Nothing here is legal advice.
+The dataset is small and deliberately so: 2 instruments, 9 provisions, 2 requirements,
+3 conflicts, 2 system profiles. A working core that demonstrates the model, not a compliance
+product. Nothing here is legal advice.
