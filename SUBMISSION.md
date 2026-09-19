@@ -217,6 +217,13 @@ changed since, so Context reports entries up to date and no rebuild has run.
 The layers check each other in both directions. In another run the agent found a duty present
 in the prose that my dataset had not modelled at all, and said so.
 
+Here is the check itself, thirty seconds of it: a script pulls Article 26 from the source and
+prints its numbered paragraphs. Paragraph 5 is the duty to monitor. Paragraph 6 is the duty to
+keep the logs. That is the whole difference between citing the right clause and the wrong one,
+and nothing short of going to the text would have shown it.
+
+{% agent_session SLICE_TAG_CITATION_ERROR %}
+
 ### Five things that cost me hours
 
 - **Document ids containing dots are invisible to anonymous readers**, even in a public
