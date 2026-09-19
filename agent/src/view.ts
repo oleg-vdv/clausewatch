@@ -186,12 +186,18 @@ footer p { font-size: .8125rem; color: var(--ink-soft); }
 
 let FOOTER_NOTE = ''
 
-/** Says plainly which way the data came in, because the two are not equivalent. */
+/**
+ * Says plainly which way the data came in. The two are not equivalent, and a page that
+ * credits a source it never touched is exactly the failure this project is about.
+ */
 export function setAccessNote(access: 'context' | 'public'): void {
   FOOTER_NOTE =
     access === 'context'
-      ? 'Read live through the Sanity Context MCP endpoints.'
-      : 'Read over the public Sanity query API — no token set, so the knowledge base and the agent are unavailable here. The structured dataset is public and this page is built entirely from it.'
+      ? 'Read live through the two Sanity Context MCP endpoints: the structured dataset for what ' +
+        'applies, the knowledge base for what the text says.'
+      : 'Read over the public Sanity query API. No Context token is set here, so this page is built ' +
+        'entirely from the structured dataset — the knowledge base and the agent are not reachable ' +
+        'without one.'
 }
 
 function shell(title: string, body: string): string {
@@ -213,7 +219,7 @@ function shell(title: string, body: string): string {
   <span class="sub">obligations, their sources, and who decided</span>
 </header>
 ${body}
-<footer><p>${FOOTER_NOTE}</p><p>Every line on this page came from the project&rsquo;s own content: the structured dataset for what applies, the knowledge base for what the text says. Nothing here is the model&rsquo;s own recollection of the law.</p></footer>
+<footer><p>${FOOTER_NOTE} Nothing here is a model&rsquo;s recollection of the law.</p></footer>
 </div>
 </body>
 </html>`

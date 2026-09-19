@@ -52,8 +52,20 @@ async function main(): Promise<void> {
   const context = new ContextClient(config)
 
   if (has('check')) {
+    if (context.access === 'public') {
+      const profiles = await context.profiles()
+      process.stdout.write(
+        'access: public dataset — no SANITY_CONTEXT_TOKEN set\n' +
+          `  dataset reads: yes, ${profiles.length} system profiles\n` +
+          '  knowledge base: no — it is served only through Sanity Context\n' +
+          '  agent: no — use --no-llm, which needs no credentials\n',
+      )
+      return
+    }
     const {data, docs} = await context.toolNames()
-    process.stdout.write(`data endpoint: ${data.join(', ')}\ndocs endpoint: ${docs.join(', ')}\n`)
+    process.stdout.write(
+      `access: Sanity Context MCP\n  data endpoint: ${data.join(', ')}\n  docs endpoint: ${docs.join(', ')}\n`,
+    )
     return
   }
 
