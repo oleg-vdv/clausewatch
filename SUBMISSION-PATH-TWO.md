@@ -93,9 +93,14 @@ without the evidence of who moved it.
 ```
 studio/   schema, desk structure, seed dataset
 app/      the signing desk — Sanity App SDK
-agent/    MCP client, the agent, the workflow gate, a server-rendered viewer
+web/      the public viewer — Astro, server-rendered
+agent/    MCP client, domain layer, the agent, the workflow gate
 demo/     saved agent runs with their tool calls attached
 ```
+
+The viewer is Astro with the Node adapter, rendered per request because every page is a live
+read of the dataset. It imports `agent/src/context.ts` rather than keeping its own copy of
+the queries, so a page and an answer cannot disagree about the law.
 
 The workflow is four types: `workflow` holding states and transitions, `workflowState`,
 `transition` (which carries `from`, `to`, `actor` and the fields a move requires), and
@@ -261,11 +266,9 @@ citation now lives.
 
 ## Honest limits
 
-The brief suggested Next.js or Astro on the front. I used neither: the app is built on the
-Sanity App SDK, which the brief named as a bonus, and the public viewer is a small
-server-rendered Node app with no framework at all. If that is a miss against the prompt, it
-is a deliberate one — the App SDK is what puts the signing screen next to the content it
-signs.
+The app requires a Sanity login. That is deliberate for a tool that writes signed decisions,
+but it does mean a judge without an account sees a login screen rather than the desk — hence
+the screenshots above and the public artefacts below them.
 
 The dataset is small: 2 instruments, 9 provisions, 2 requirements, 3 conflicts, 2 system
 profiles, 1 workflow. It is a working core that demonstrates the model, not a compliance

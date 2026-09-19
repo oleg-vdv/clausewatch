@@ -38,8 +38,8 @@ It is in the relationship between them — which is to say, in the schema.
 ## Demo
 
 ```bash
-git clone https://github.com/oleg-vdv/clausewatch && cd clausewatch/agent
-npm install && npm run web       # http://localhost:4173
+git clone https://github.com/oleg-vdv/clausewatch && cd clausewatch/web
+npm install && npm run dev       # http://localhost:4173
 ```
 
 **No credentials.** No login, no token, no API key. The dataset is public, so a fresh clone
@@ -51,6 +51,7 @@ touched.
 It also runs with no model at all:
 
 ```bash
+cd ../agent && npm install
 npm run ask -- --profile biometric-access --no-llm   # provider, high-risk, KZ → EU
 npm run ask -- --profile support-agent --no-llm      # deployer, risk class unset
 ```
@@ -81,7 +82,8 @@ screen, because that is the one thing an editor of this dataset actually does.
 
 ```
 studio/   schema, desk structure, seed dataset
-agent/    MCP client, domain layer, LLM agent, deterministic report, viewer
+agent/    MCP client, domain layer, LLM agent, deterministic report
+web/      the viewer — Astro, server-rendered, sharing the agent's domain layer
 demo/     saved runs with their tool calls attached
 ```
 
