@@ -290,7 +290,7 @@ the single number the question was fishing for.
 
 {% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj The agent refuses to give one number %}
 
-### Context found a contradiction I had not
+### The Annex I check, start to finish
 
 This one starts with a Sanity Context issue: an entry says Annex I lists 21 harmonisation
 instruments, the source shows 20. You will see me go to the source rather than take it on
