@@ -1,0 +1,106 @@
+// ClauseWatch — the queries the agent runs against the structured dataset.
+//
+// STATUS: drafted against the schema, NOT yet run. Validate each one in Vision after
+// the seed import; GROQ scoping rules bite hardest exactly where these are interesting.
+//
+// The agent reads structure here and prose from the Knowledge Base. Every value it
+// states out loud must come back from one of these with a citation attached.
+
+// ---------------------------------------------------------------------------
+// 1. Conflicts, both sides, unresolved first.
+//    This is the query a keyword search cannot imitate: the fact that two clauses
+//    collide lives in the relationship between documents, not in either text.
+// ---------------------------------------------------------------------------
+*[_type == "conflict"]{
+  summary,
+  nature,
+  resolution,
+  rationale,
+  decidedBy,
+  decidedAt,
+  "requirement": requirement->obligation,
+  "sides": sides[]->{
+    "source": source->shortName,
+    "binding": source->bindingStatus,
+    citation,
+    heading,
+    effectiveFrom,
+    "officialUrl": coalesce(sourceUrl, source->officialUrl),
+    "text": pt::text(text)
+  }
+} | order(select(resolution == "open" => 0, 1), nature)
+
+// ---------------------------------------------------------------------------
+// 2. What applies to one system, filtered by the jurisdictions it actually touches.
+//    $jurisdictions comes from the profile: operatesIn plus outputUsedIn, because
+//    the AI Act reaches operators outside the EU when the output is used inside it.
+// ---------------------------------------------------------------------------
+// Pass $topic == "*" for every topic; an undefined param is an error in GROQ, not a wildcard.
+*[_type == "requirement" && ($topic == "*" || topic == $topic)]{
+  obligation,
+  topic,
+  evidenceHint,
+  "claims": claims[provision->source->jurisdiction->code in $jurisdictions]{
+    assertion,
+    strength,
+    retentionMonths,
+    conditionalOn,
+    "cite": provision->source->shortName + " " + provision->citation,
+    "effectiveFrom": provision->effectiveFrom,
+    "url": coalesce(provision->sourceUrl, provision->source->officialUrl)
+  },
+  "openConflicts": conflicts[]->{summary, nature, resolution}
+}[count(claims) > 0]
+
+// ---------------------------------------------------------------------------
+// 3. The retention spread, split by which way each clause pushes.
+//    An earlier version of this query bucketed by "does it state a number", which
+//    filed GDPR Art. 5(1)(e) under silence. It is not silent: it caps the period
+//    without naming one. `direction` is what makes floor, ceiling and duty-only
+//    three different answers instead of two.
+//    Verified against the live dataset 2026-09-19.
+// ---------------------------------------------------------------------------
+*[_type == "requirement" && count(claims[direction != "none"]) > 0]{
+  obligation,
+  "floor": claims[direction == "floor"]{
+    retentionMonths,
+    conditionalOn,
+    "cite": provision->source->shortName + " " + provision->citation
+  },
+  "ceiling": claims[direction == "ceiling"]{
+    retentionMonths,
+    assertion,
+    "cite": provision->source->shortName + " " + provision->citation
+  },
+  "dutyOnly": claims[direction == "none"]{
+    assertion,
+    "cite": provision->source->shortName + " " + provision->citation
+  },
+  "conflicts": conflicts[]->{summary, resolution, rationale, decidedBy}
+}
+
+// ---------------------------------------------------------------------------
+// 4. Coverage check for agentic systems.
+//    None of these instruments was drafted for tool-calling agents. The honest
+//    answer is often "the text stops here", and this query is what lets the agent
+//    say that with citations instead of improvising.
+// ---------------------------------------------------------------------------
+{
+  "profile": *[_type == "systemProfile" && slug.current == $profile][0]{
+    name, riskClass, agentic, isGpai,
+    "roles": roles[]->name,
+    "operatesIn": operatesIn[]->code,
+    "outputUsedIn": outputUsedIn[]->code
+  },
+  "requirementsTouchingRoles": *[_type == "requirement"]{
+    obligation,
+    "claimsForRole": claims[
+      count(provision->appliesToRoles[@->name in $roles]) > 0
+    ]{
+      assertion,
+      strength,
+      "cite": provision->source->shortName + " " + provision->citation
+    }
+  }[count(claimsForRole) > 0],
+  "unclassified": *[_type == "systemProfile" && riskClass == "unknown"]{name, description}
+}
