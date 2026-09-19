@@ -1,0 +1,30 @@
+---
+import type {Claim} from '../lib/data'
+
+interface Props {
+  claim: Claim
+  durationIsAtIssue: boolean
+}
+
+const {claim, durationIsAtIssue} = Astro.props
+const binds = claim.binds?.map((r) => r.name).join(' and ')
+---
+
+<div class="duty">
+  <span class="strength">{claim.strength}</span>
+  <p style="margin:.2rem 0 .4rem">{claim.assertion}</p>
+  <p class="cite">
+    {claim.url ? <a href={claim.url} rel="noreferrer">{claim.cite}</a> : claim.cite}
+    {claim.effectiveFrom && <> · in force {claim.effectiveFrom}</>}
+    {binds && <> · binds the {binds}</>}
+  </p>
+  {claim.conditionalOn && <p class="when">Applies when: {claim.conditionalOn}</p>}
+  {
+    durationIsAtIssue && claim.direction === 'none' && claim.retentionMonths === null && (
+      <p class="when">
+        This clause imposes the duty and says nothing about how long. That silence is the
+        clause, not a gap in the data.
+      </p>
+    )
+  }
+</div>

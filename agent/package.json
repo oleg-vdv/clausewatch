@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "ask": "tsx src/cli.ts",
-    "typecheck": "tsc --noEmit",
-    "web": "tsx src/web.ts"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.70.0"

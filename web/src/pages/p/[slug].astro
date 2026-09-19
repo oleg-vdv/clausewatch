@@ -1,0 +1,98 @@
+---
+import Page from '../../layouts/Page.astro'
+import PressureBar from '../../components/PressureBar.astro'
+import Decision from '../../components/Decision.astro'
+import Duty from '../../components/Duty.astro'
+import {context} from '../../lib/data'
+
+const {slug} = Astro.params
+
+const profile = slug ? await context.profile(slug) : null
+if (!profile) return new Response(`No system profile called "${slug}".`, {status: 404})
+
+const requirements = await context.obligations(profile.jurisdictions, profile.roles)
+
+const facts = [
+  `role: ${profile.roles.join(', ') || 'unset'}`,
+  `risk: ${profile.riskClass}`,
+  `reaches: ${profile.jurisdictions.join(', ')}`,
+  profile.agentic ? 'takes actions' : null,
+  profile.isGpai ? 'general-purpose model' : null,
+].filter(Boolean) as string[]
+---
+
+<Page title={`${profile.name} — ClauseWatch`}>
+  <div class="entry">
+    <div class="margin">{facts.map((f) => <p>{f}</p>)}</div>
+    <div class="body">
+      <h1>{profile.name}</h1>
+      <p class="lede">{profile.description}</p>
+      {
+        profile.riskClass === 'unknown' && (
+          <p class="lede">
+            <strong>Risk class is not set.</strong> Most duties below turn on a high-risk
+            classification that nobody has made for this system yet, so read them as conditional.
+          </p>
+        )
+      }
+    </div>
+  </div>
+
+  {
+    requirements.length === 0 ? (
+      <div class="entry">
+        <div class="margin">
+          <p class="eyebrow">Nothing found</p>
+        </div>
+        <div class="body">
+          <p>
+            No instrument in this dataset binds {profile.roles.join(' or ') || 'this role'} in{' '}
+            {profile.jurisdictions.join(', ')}. That is a fact about the dataset, not about the law.
+          </p>
+        </div>
+      </div>
+    ) : (
+      requirements.map((requirement) => {
+        const floors = requirement.claims.filter((c) => c.direction === 'floor')
+        const ceilings = requirement.claims.filter((c) => c.direction === 'ceiling')
+        const duties = requirement.claims.filter((c) => c.direction === 'none')
+        const durationIsAtIssue = floors.length > 0 || ceilings.length > 0
+
+        const parties = [...new Set(requirement.claims.flatMap((c) => (c.binds ?? []).map((r) => r.name)))]
+        const dates = [...new Set(requirement.claims.map((c) => c.effectiveFrom).filter(Boolean))].sort()
+
+        return (
+          <div class="entry">
+            <div class="margin">
+              <p class="eyebrow">{requirement.topic}</p>
+              {parties.length > 0 && <p>binds: {parties.join(', ')}</p>}
+              {dates.length > 0 && <p>in force: {dates.join(', ')}</p>}
+              <p>
+                {requirement.claims.length} clause{requirement.claims.length === 1 ? '' : 's'}
+              </p>
+            </div>
+            <div class="body">
+              <h2>{requirement.obligation}</h2>
+
+              {durationIsAtIssue && <PressureBar floors={floors} ceilings={ceilings} />}
+
+              {duties.map((claim) => (
+                <Duty claim={claim} durationIsAtIssue={durationIsAtIssue} />
+              ))}
+
+              {requirement.conflicts.map((conflict) => (
+                <Decision conflict={conflict} />
+              ))}
+
+              {requirement.evidenceHint && (
+                <p class="note" style="margin-top:1.25rem">
+                  <strong>What an auditor asks for.</strong> {requirement.evidenceHint}
+                </p>
+              )}
+            </div>
+          </div>
+        )
+      })
+    )
+  }
+</Page>

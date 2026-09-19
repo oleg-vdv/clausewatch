@@ -1,0 +1,72 @@
+---
+import type {Claim} from '../lib/data'
+
+interface Props {
+  floors: Claim[]
+  ceilings: Claim[]
+}
+
+const {floors, ceilings} = Astro.props
+const floor = floors[0]
+const ceiling = ceilings[0]
+
+const middle =
+  floor && ceiling
+    ? 'you choose a period in here, and justify it against both'
+    : floor
+      ? 'nothing in these sources caps it'
+      : 'nothing in these sources sets a minimum'
+---
+
+{/*
+  The floor is a number and the ceiling is not, so the right edge is hatched rather
+  than measured. Drawing a tidy range would be a lie about the law.
+*/}
+<div class="pressure">
+  <p class="eyebrow">How long</p>
+  <div class="pressure-bar" data-middle={middle}></div>
+  <div class="pressure-ends">
+    <span class="lo">
+      {
+        floor ? (
+          <>
+            <b>at least {floor.retentionMonths ?? '—'} months</b>
+            <span class="cite-under">{floor.cite}</span>
+          </>
+        ) : (
+          <>
+            <b>no minimum</b>
+            <span class="cite-under">nothing in these sources sets one</span>
+          </>
+        )
+      }
+    </span>
+    <span class="hi">
+      {
+        ceiling ? (
+          <>
+            <b>
+              {ceiling.retentionMonths === null
+                ? 'no stated number'
+                : `at most ${ceiling.retentionMonths} months`}
+            </b>
+            <span class="cite-under">{ceiling.cite}</span>
+          </>
+        ) : (
+          <>
+            <b>no cap</b>
+            <span class="cite-under">nothing in these sources sets one</span>
+          </>
+        )
+      }
+    </span>
+  </div>
+  {
+    floor && ceiling && (
+      <p class="note" style="margin-top:.6rem">
+        The hatched end has no edge because no text draws one. {ceiling.cite} caps the period by
+        necessity without naming a number.
+      </p>
+    )
+  }
+</div>

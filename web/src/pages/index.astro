@@ -1,0 +1,45 @@
+---
+import Page from '../layouts/Page.astro'
+import {context} from '../lib/data'
+
+const profiles = await context.profiles()
+---
+
+<Page title="ClauseWatch">
+  <div class="entry">
+    <div class="margin"><p class="eyebrow">Systems on file</p></div>
+    <div class="body">
+      <h1>What binds this system, and who decided the parts the texts disagree on.</h1>
+      <p class="lede">
+        Pick a system. Its obligations are assembled from the instruments that bind its role in
+        the jurisdictions it touches — each with the clause it came from and the date it starts
+        to bite. Where two instruments pull in opposite directions, both are shown, and the
+        decision between them is a signature, not an inference.
+      </p>
+    </div>
+  </div>
+
+  <div class="entry">
+    <div class="margin">
+      <p>{profiles.length} profile{profiles.length === 1 ? '' : 's'}</p>
+    </div>
+    <div class="body">
+      <ul class="profiles">
+        {
+          profiles.map((profile) => (
+            <li>
+              <a href={`/p/${profile.slug}`}>
+                <span class="name">{profile.name}</span>
+                <span class="facts">
+                  {profile.roles.join(' / ') || 'role unset'} · {profile.riskClass} ·{' '}
+                  {profile.jurisdictions.join(' ')}
+                </span>
+                <span class="desc">{profile.description}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</Page>

@@ -1,0 +1,38 @@
+---
+import type {Conflict} from '../lib/data'
+
+interface Props {
+  conflict: Conflict
+}
+
+const {conflict} = Astro.props
+const open = conflict.resolution === 'open'
+---
+
+{/*
+  The signature block. Resolved, the rules carry a name and a date; open, they are
+  two empty lines in a compliance report. That is the thesis as a form field.
+*/}
+<div class:list={['decision', open ? 'open' : 'signed']}>
+  <p class="eyebrow">{open ? 'Undecided' : 'Decided'} · {conflict.nature}</p>
+  <h3>{conflict.summary}</h3>
+  <p class="sides">{conflict.sides.map((s) => s.cite).join('  ×  ')}</p>
+
+  {conflict.rationale && <p class="rationale">{conflict.rationale}</p>}
+
+  <div class="signature">
+    <div class:list={['line', !open && 'filled']}>{open ? '' : conflict.decidedBy}</div>
+    <div class:list={['line', !open && 'filled']}>{open ? '' : (conflict.decidedAt ?? '').slice(0, 10)}</div>
+    <div class="label">Decided by</div>
+    <div class="label">Date</div>
+  </div>
+
+  {
+    open && (
+      <p class="note" style="margin-top:.9rem">
+        Both clauses stand until someone signs. The dataset keeps these two fields for exactly
+        that, and they are empty.
+      </p>
+    )
+  }
+</div>

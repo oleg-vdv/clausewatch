@@ -84,8 +84,17 @@ npm run ask -- --check                              # what this clone can reach
 npm run ask -- --profiles                           # system profiles in the dataset
 npm run ask -- --profile biometric-access --no-llm  # the full report
 npm run ask -- --profile support-agent --no-llm     # the same ground for a deployer
-npm run web                                         # the viewer, http://localhost:4173
+npm run ask -- --workflow                           # the decision process, and who may move it
 ```
+
+The viewer is a separate Astro app:
+
+```bash
+cd ../web && npm install && npm run dev             # http://localhost:4173
+```
+
+The viewer and the agent share one domain layer: `web/` imports `agent/src/context.ts`
+rather than keeping its own copy, so a page and an answer cannot disagree about the law.
 
 `--no-llm` composes the answer straight from the dataset with no model involved. It exists so
 the project can be checked by anyone, and so the LLM path has something to be measured
