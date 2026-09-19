@@ -222,6 +222,9 @@ prints its numbered paragraphs. Paragraph 5 is the duty to monitor. Paragraph 6 
 keep the logs. That is the whole difference between citing the right clause and the wrong one,
 and nothing short of going to the text would have shown it.
 
+*Embedded session cards open collapsed — click the ▸ to see the command and everything it
+printed. Same for the three further down.*
+
 {% agent_session building-clausewatch-an-agent-over-contradictory-ai-regulation-omcvgj 313..313 %}
 
 ### Five things that cost me hours
@@ -274,7 +277,8 @@ The whole build is on record — 485 messages in one Claude Code session. A note
 open it: I work in Russian, so the conversation is in Russian. Everything that matters here
 is not. The tool calls, the GROQ queries, the MCP traces, the terminal output and the agent's
 own answers are all English, and that is what each slice below is made of. I have said what
-to look for in front of each one.
+to look for in front of each one — and each card opens collapsed, so click the ▸ to see the
+output rather than just the command line.
 
 ### The agent refuses to give one number
 
