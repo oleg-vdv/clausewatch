@@ -71,7 +71,8 @@ will get Sanity's login screen rather than the app.
 
 The desk lists whatever the dataset says is in `review` — it holds no state of its own. For
 each conflict it shows both clauses verbatim with their citations, the steps the agent
-already took with timestamps and the actor on each, and then a form.
+already took with timestamps and the actor on each, and then a form. If the list is empty
+when you open it, nothing is waiting: see the note under Sanity Project Details.
 
 The form asks for what was decided, why, and a name. The signature is **typed**. The App SDK
 has no current-user hook, which turned out to be the right accident: a name that fills itself
@@ -219,8 +220,19 @@ https://4yzoidsq.api.sanity.io/v2026-09-19/data/query/production?query=*[_type==
 https://4yzoidsq.api.sanity.io/v2026-09-19/data/query/production?query=*[_type=="conflict"]{summary,state,decidedBy,"moves":history[]{to,actor,actorKind}}
 ```
 
-Three conflicts sit at three points on purpose: one raised and untouched, one awaiting a
-signature, one decided with its full history and a name against it.
+Two of the three conflicts are decided, and the second one was signed through the app in
+this post rather than seeded that way. Its history reads:
+
+```
+raised    → gathering   clausewatch-agent (agent)
+gathering → review      clausewatch-agent (agent)
+review    → decided     Oleg Vdovin (human)   2026-09-19 15:25
+```
+
+Which means that if you open the signing desk now it will tell you nothing is waiting for a
+signature. That is the desk working, not the desk broken: the conflict in the screenshots
+above is the one that was signed. The third conflict is still `raised` and untouched, so the
+agent has somewhere to go next.
 
 ## Agent Session
 
