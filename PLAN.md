@@ -400,3 +400,27 @@ An App SDK app where a person makes the `review → decided` move: `npx sanity@l
 --template app-quickstart`, then `sanity deploy`. Deploying needs org admin or a token with
 **Manage SDK Apps** — the current deploy token has Deploy Studios only, so that permission
 has to be added before the app can ship.
+
+## The signing desk is live (2026-09-19)
+
+App SDK app deployed to the organisation dashboard:
+**https://www.sanity.io/@o7br4pucm/application/wpdwxiwyygohwmtn59yz92ap** — app id
+`wpdwxiwyygohwmtn59yz92ap`, recorded in `app/sanity.cli.ts` so later deploys update it.
+
+It does one thing: the `review → decided` move the workflow reserves for a person. The list
+is whatever the dataset says is in `review`; the app holds no state of its own. Both clauses
+are shown verbatim with citations, the agent's own steps are listed above the form, and the
+decision plus its transition record are written in a single edit so the state cannot move
+without evidence of who moved it.
+
+**`sanity dev` binds IPv6 only.** The port listens on `[::1]:3333` and nothing resolving
+localhost to 127.0.0.1 can reach it — the page just never loads. `server.hostname:
+'127.0.0.1'` in `sanity.cli.ts` fixes it. Not in the docs.
+
+**The app requires a Sanity login**, which is correct for a signing tool: it redirects to
+sanity.io rather than rendering anything to an anonymous visitor. Judges will need to be
+logged in to open it, so the post should say so and lead with the public artefacts instead.
+
+Deploying needed a token with **Manage SDK Apps**; token permissions cannot be edited after
+creation, so this took a second token (`clausewatch-deploy-v2`, also carrying Deploy Studios
+and project Editor). The old `clausewatch-cli-deploy` can be deleted.
