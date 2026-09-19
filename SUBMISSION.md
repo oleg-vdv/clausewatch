@@ -61,9 +61,16 @@ Two elements of the viewer do the arguing.
 hatched, edgeless right where the GDPR caps the period without naming one. Drawing a tidy
 range there would be a lie about the law.
 
+<!-- IMAGE 1: the pressure bar. Crop from "HOW LONG" down to the sentence about the
+     hatched end, on http://localhost:4173/p/support-agent -->
+
 **The signature block** — every conflict prints a *decided by* and a *date* rule. Resolved,
 they carry a name and a date. Open, they are two empty lines in a compliance report. The
 thesis as a form field rather than a paragraph.
+
+<!-- IMAGE 2 (also the cover): the unsigned decision. Crop the grey panel from
+     "UNDECIDED · QUANTITY" down through the empty DECIDED BY / DATE rules and the line
+     "Both clauses stand until someone signs", same page -->
 
 The Studio is live at **https://clausewatch.sanity.studio/**, with open conflicts on the first
 screen, because that is the one thing an editor of this dataset actually does.
