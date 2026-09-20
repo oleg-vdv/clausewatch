@@ -35,6 +35,44 @@ Art. 19 and stops. It cannot know that a clause in a *different regulation* cons
 same artifact from the opposite direction, because that fact is not inside either document.
 It is in the relationship between them — which is to say, in the schema.
 
+## The control: I ran the keyword search
+
+The brief sets a bar — *if a keyword search would have gotten you the same answer, aim
+higher* — so rather than assert we cleared it, here is the other arm of the experiment.
+Ordinary tf-idf over the same clause texts the knowledge base is built from:
+
+```
+$ npm run ask -- --baseline "how long must I keep automatically generated logs"
+
+  0.2763  EU AI Act Art. 19     — Automatically generated logs
+  0.2763  EU AI Act Art. 26(6)  — Deployer duty to keep automatically generated logs
+```
+
+Two clauses, **identical scores**. Ranking cannot break that tie, because which one binds
+you is not a property of either text — it depends on whether you are the provider or the
+deployer, which is a fact about you.
+
+And GDPR Art. 5(1)(e) is not in the results at all. It is the clause that makes the answer
+wrong if you ignore it, and it is invisible to this query because it never says *logs*. It
+says *personal data*:
+
+```
+$ npm run ask -- --baseline "how long may I keep personal data"
+
+  0.2865  GDPR Art. 5(1)(e)     — Storage limitation
+  0.1066  EU AI Act Art. 26(6)  — Deployer duty to keep automatically generated logs
+  0.0759  EU AI Act Art. 19     — Automatically generated logs
+```
+
+The two halves of the answer live under different vocabularies. Finding both requires
+already knowing both exist, which is the question you were asking in the first place.
+
+Asking about the collision directly returns one clause, because the collision is not in any
+document. It is a relationship between two of them, and a flat index of documents has
+nowhere to put a relationship. That is the whole argument for modelling it, and it is now a
+command anyone can run rather than a claim in a blog post: the full comparison is in
+[`demo/05-keyword-baseline.md`](https://github.com/oleg-vdv/clausewatch/blob/main/demo/05-keyword-baseline.md).
+
 ## Demo
 
 ```bash

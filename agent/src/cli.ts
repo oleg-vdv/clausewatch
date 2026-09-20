@@ -5,6 +5,7 @@ import {ContextClient} from './context.js'
 import {renderReport} from './report.js'
 import {ask} from './agent.js'
 import {describeMoves} from './gate.js'
+import {BLIND_SPOTS, search} from './baseline.js'
 
 /**
  * clausewatch — ask what a system actually has to do, and where the sources disagree.
@@ -25,6 +26,7 @@ const HELP = `clausewatch
   --check             verify both MCP endpoints answer
   --workflow          the decision process, and what each actor may do next
   --as <agent|human>  which actor to show the workflow for (default: agent)
+  --baseline "<q>"    the control: tf-idf keyword search over the same clauses
   --out <file>        save the run, with its tool calls, as markdown
   "<question>"        free-form question, answered by the agent over both endpoints
 `
@@ -79,6 +81,36 @@ async function main(): Promise<void> {
         `${profile.slug}\n  ${profile.name}\n  ${profile.roles.join(', ')} · ${profile.riskClass} · ${profile.jurisdictions.join(', ')}\n`,
       )
     }
+    return
+  }
+
+  if (has('baseline')) {
+    const question = words.join(' ')
+    if (!question) throw new Error('Give --baseline a question in quotes.')
+
+    const hits = search(await context.provisionTexts(), question)
+
+    const lines = [`Keyword search over the same clauses`, `  "${question}"`, '']
+
+    if (hits.length === 0) {
+      lines.push('  nothing matched')
+    } else {
+      for (const hit of hits.slice(0, 4)) {
+        lines.push(`  ${hit.score.toFixed(4)}  ${hit.cite} — ${hit.heading ?? ''}`)
+        lines.push(`          ${hit.text.slice(0, 150).replace(/\s+/g, ' ')}…`)
+      }
+    }
+
+    lines.push('', 'What the ranking cannot answer, however it is tuned:')
+    for (const spot of BLIND_SPOTS) lines.push(`  · ${spot}`)
+    lines.push(
+      '',
+      'Each of those is a relationship between documents. A flat index of the same',
+      'documents does not hold relationships, so no amount of ranking produces them.',
+      'Run --profile <slug> --no-llm for the answers.',
+    )
+
+    process.stdout.write(lines.join('\n') + '\n')
     return
   }
 

@@ -253,6 +253,15 @@ export class ContextClient {
     } | order(state)`)
   }
 
+  /** Every clause as flat text — the same material the knowledge base was built from. */
+  async provisionTexts(): Promise<Array<{cite: string; heading: string | null; text: string}>> {
+    return this.query(`*[_type == "provision" && defined(text)]{
+      "cite": source->shortName + " " + citation,
+      heading,
+      "text": pt::text(text)
+    }`)
+  }
+
   async conflicts(): Promise<Conflict[]> {
     return this.query<Conflict[]>(
       `*[_type == "conflict"] | order(select(resolution == "open" => 0, 1), nature) ${CONFLICT_PROJECTION}`,
