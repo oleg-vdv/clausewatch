@@ -424,3 +424,25 @@ logged in to open it, so the post should say so and lead with the public artefac
 Deploying needed a token with **Manage SDK Apps**; token permissions cannot be edited after
 creation, so this took a second token (`clausewatch-deploy-v2`, also carrying Deploy Studios
 and project Editor). The old `clausewatch-cli-deploy` can be deleted.
+
+## The viewer moved to Astro (2026-09-20)
+
+Path Two's brief named Next.js or Astro on the front. The viewer was a hand-rolled Node
+server writing HTML strings, and the post admitted the miss rather than closing it. Astro
+with the Node adapter suits it exactly: `output: 'server'`, rendered per request, because
+every page is a live read of the dataset and there is nothing worth building ahead of time.
+
+`agent/src/web.ts` and `agent/src/view.ts` are gone. The pages are `.astro` components and
+the stylesheet is a real CSS file rather than a template literal.
+
+**The domain layer is shared, not copied.** `web/src/lib/data.ts` imports
+`agent/src/context.ts` directly, so one definition of an obligation serves both the page and
+the agent, and they cannot drift apart. Vite resolves the agent's NodeNext `.js` specifiers
+to their `.ts` sources across the package boundary with `vite.server.fs.allow: ['..']`.
+
+Verified from a fresh GitHub clone, running exactly the commands the post now gives: install,
+build, serve, all three routes 200, and the bundled stylesheet still carries the print rules,
+the dark theme, the reduced-motion guard and the pressure bar.
+
+Both posts were edited to match: Path One's Demo commands pointed at a script that no longer
+exists, and Path Two's "Honest limits" claimed a deviation that is no longer true.
